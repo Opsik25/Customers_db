@@ -64,14 +64,7 @@ def add_customer(conn, name: str, surname: str, email: str, phone_number=None): 
                 VALUES (%s, %s);
                 """, (phone, customer_id))
 
-        cur.execute("""
-        SELECT *
-          FROM customers
-          JOIN phones
-            ON customers.customer_id = phones.customer_id
-         WHERE phones.customer_id = %s;
-        """, (customer_id,))
-        print(cur.fetchall())
+        conn.commit()
 
 
 def add_phone_customer(conn, customer_id: int, phone_number: str):
@@ -205,7 +198,10 @@ if __name__ == '__main__':
         add_customer(conn, 'Евгений', 'Попов', 'evgeniypopov@mail.ru', ['89036986542'])
         add_customer(conn, 'Дмитрий', 'Сидоров', 'dmitriysidorov@yandex.ru',
                      phone_number=['89000000000', '89999999999'])
+        add_customer(conn, 'Елена', 'Макеева', 'elenamakeeva@mail.ru')
+        add_customer(conn, 'Светлана', 'Тарасова', 'svetiktarasik@mail.ru')
         add_phone_customer(conn, 1, '89222222222')
+        add_phone_customer(conn, 5, '89123456789')
         change_customer_info(conn, customer_id=1, name='Степан', surname='Петров',
                              old_phone_number='89111111111', new_phone_number='89333333333')
         delete_phone(conn, 1, '89222222222')
