@@ -166,17 +166,33 @@ def delete_customer(conn, customer_id: int):
 
 def search_customer(conn, name=None, surname=None, email=None, phone_number=None):
     with conn.cursor() as cur:
-        cur.execute("""
-        SELECT *
-          FROM customers
-          JOIN phones
-            ON customers.customer_id = phones.customer_id
-         WHERE name = %s
-            OR surname = %s
-            OR email = %s
-            OR phone_number = %s;
-        """, (name, surname, email, phone_number))
-        print(cur.fetchall())
+        if phone_number is not None:
+            cur.execute("""
+            SELECT customer_id
+              FROM phones
+             WHERE phone_number = %s;
+            """, (phone_number,))
+            customer_id = cur.fetchone()[0]
+
+            cur.execute("""
+            SELECT *
+              FROM customers
+              JOIN phones
+                ON customers.customer_id = phones.customer_id
+             WHERE phones.customer_id = %s;
+            """, (customer_id,))
+            print(cur.fetchall())
+        else:
+            cur.execute("""
+            SELECT *
+              FROM customers
+              JOIN phones
+                ON customers.customer_id = phones.customer_id
+             WHERE name = %s
+                OR surname = %s
+                OR email = %s;
+            """, (name, surname, email))
+            print(cur.fetchall())
 
 
 if __name__ == '__main__':
@@ -198,4 +214,5 @@ if __name__ == '__main__':
         search_customer(conn, surname='Попов')
         search_customer(conn, email='dmitriysidorov@yandex.ru')
         search_customer(conn, phone_number='89999999999')
+        search_customer(conn, phone_number='89036986542')
     conn.close()
